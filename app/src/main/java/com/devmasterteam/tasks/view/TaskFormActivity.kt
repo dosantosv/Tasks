@@ -10,16 +10,19 @@ import androidx.lifecycle.ViewModelProvider
 import com.devmasterteam.tasks.R
 import com.devmasterteam.tasks.databinding.ActivityRegisterBinding
 import com.devmasterteam.tasks.databinding.ActivityTaskFormBinding
+import com.devmasterteam.tasks.service.model.PriorityModel
+import com.devmasterteam.tasks.service.model.TaskModel
 import com.devmasterteam.tasks.viewmodel.RegisterViewModel
 import com.devmasterteam.tasks.viewmodel.TaskFormViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-class TaskFormActivity : AppCompatActivity(), View.OnClickListener, DatePickerDialog.OnDateSetListener {
+class TaskFormActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var viewModel: TaskFormViewModel
     private lateinit var binding: ActivityTaskFormBinding
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    private var listPriority: List<PriorityModel> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +32,8 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener, DatePickerDi
         binding = ActivityTaskFormBinding.inflate(layoutInflater)
 
         // Eventos
-        binding.buttonSave.setOnClickListener(this)
-        binding.buttonDate.setOnClickListener(this)
+        binding.buttonSave.setOnClickListener{ handleDate() }
+        binding.buttonDate.setOnClickListener{ handleSave() }
 
         viewModel.loadPriorities()
 
@@ -38,12 +41,6 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener, DatePickerDi
 
         // Layout
         setContentView(binding.root)
-    }
-
-    override fun onClick(v: View) {
-        if(v.id == R.id.button_date) {
-            handleDate()
-        }
     }
 
     override fun onDateSet(v: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
@@ -56,6 +53,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener, DatePickerDi
 
     private fun observe() {
         viewModel.priorityList.observe(this) {
+            listPriority = it
             val list = mutableListOf<String>()
 
             for (item in it) {
@@ -65,6 +63,21 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener, DatePickerDi
             val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list)
             binding.spinnerPriority.adapter = adapter
         }
+    }
+
+
+    private fun handleSave() {
+        val task = TaskModel().apply {
+            this.id = 0
+            this.description = binding.editDescription.text.toString()
+            this.complete = binding.checkComplete.isChecked
+            this.dueDate = binding.buttonDate.text.toString()
+
+            val index = binding.spinnerPriority.selectedItemPosition
+            this.priorityId = listPriority[index].id
+        }
+
+        viewModel.save(task)
     }
 
     private fun handleDate() {
