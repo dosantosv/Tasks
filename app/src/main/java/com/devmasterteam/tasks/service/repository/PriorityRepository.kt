@@ -32,6 +32,10 @@ class PriorityRepository(val context: Context): BaseRepository() {
         })
     }
 
+    fun getDescription(id: Int): String {
+        return database.getDescription(id)
+    }
+
     fun list(): List<PriorityModel> {
         return database.list()
     }
