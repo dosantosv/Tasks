@@ -10,45 +10,32 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TaskRepository(val context: Context): BaseRepository() {
+class TaskRepository(context: Context): BaseRepository(context) {
 
     private val remote = RetrofitClient.getService(TaskService::class.java)
 
     fun createTask(task: TaskModel, listener: APIListener<Boolean>) {
         val call = remote.createTask(task.id, task.description, task.dueDate, task.complete)
-        callEnqueue(listener, call)
+        executeCall(listener, call)
     }
 
     fun getTasks(listener: APIListener<List<TaskModel>>) {
         val call = remote.getTasks()
-        callEnqueue(listener, call)
+        executeCall(listener, call)
     }
 
     fun getTasksNextSevenDays(listener: APIListener<List<TaskModel>>) {
         val call = remote.getTasksNextSevenDays()
-        callEnqueue(listener, call)
+        executeCall(listener, call)
     }
 
     fun getTaskOverdue(listener: APIListener<List<TaskModel>>) {
         val call = remote.getTaskOverdue()
-        callEnqueue(listener, call)
+        executeCall(listener, call)
     }
 
     fun deleteTask(id: Int, listener: APIListener<Boolean>) {
         val call = remote.deleteTask(id)
-        callEnqueue(listener, call)
-    }
-
-    private fun <T> callEnqueue (listener: APIListener<T>, call: Call<T>) {
-        call.enqueue(object : Callback<T> {
-            override fun onResponse(call: Call<T>, response: Response<T>, ) {
-                handleResponse(response, listener)
-            }
-
-            override fun onFailure(call: Call<T>, t: Throwable) {
-                listener.onFailure(context.getString(R.string.ERROR_UNEXPECTED))
-            }
-
-        })
+        executeCall(listener, call)
     }
 }
