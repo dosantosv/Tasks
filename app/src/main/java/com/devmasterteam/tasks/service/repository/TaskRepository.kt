@@ -34,6 +34,11 @@ class TaskRepository(val context: Context): BaseRepository() {
         callEnqueue(listener, call)
     }
 
+    fun deleteTask(id: Int, listener: APIListener<Boolean>) {
+        val call = remote.deleteTask(id)
+        callEnqueue(listener, call)
+    }
+
     private fun <T> callEnqueue (listener: APIListener<T>, call: Call<T>) {
         call.enqueue(object : Callback<T> {
             override fun onResponse(call: Call<T>, response: Response<T>, ) {

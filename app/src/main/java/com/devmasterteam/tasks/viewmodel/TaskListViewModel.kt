@@ -19,6 +19,9 @@ class TaskListViewModel(application: Application) : AndroidViewModel(application
     private val _tasks = MutableLiveData<List<TaskModel>>()
     val tasks: LiveData<List<TaskModel>> = _tasks
 
+    private val _delete = MutableLiveData<FunctionResponse>()
+    val delete: LiveData<FunctionResponse> = _delete
+
     fun getTasks() {
         taskRepository.getTasks(object: APIListener<List<TaskModel>> {
             override fun onSucess(result: List<TaskModel>) {
@@ -30,6 +33,19 @@ class TaskListViewModel(application: Application) : AndroidViewModel(application
             }
 
             override fun onFailure(message: String) {}
+
+        })
+    }
+
+    fun deleteTask(id: Int) {
+        taskRepository.deleteTask(id, object : APIListener<Boolean> {
+            override fun onSucess(result: Boolean) {
+                getTasks()
+            }
+
+            override fun onFailure(message: String) {
+                _delete.value = FunctionResponse(message, false)
+            }
 
         })
     }
