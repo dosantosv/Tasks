@@ -14,18 +14,14 @@ open class BaseRepository(val context: Context) {
         return Gson().fromJson(str, String::class.java)
     }
 
-    fun <T> handleResponse(response: Response<T>, listener: APIListener<T>) {
-        if(response.code() == TaskConstants.HTTP.SUCCESS) {
-            response.body()?.let { listener.onSucess(it) }
-        } else {
-            listener.onFailure(failResponse(response.errorBody()!!.string()))
-        }
-    }
-
     fun <T> executeCall (listener: APIListener<T>, call: Call<T>) {
         call.enqueue(object : Callback<T> {
             override fun onResponse(call: Call<T>, response: Response<T>, ) {
-                handleResponse(response, listener)
+                if(response.code() == TaskConstants.HTTP.SUCCESS) {
+                    response.body()?.let { listener.onSucess(it) }
+                } else {
+                    listener.onFailure(failResponse(response.errorBody()!!.string()))
+                }
             }
 
             override fun onFailure(call: Call<T>, t: Throwable) {
