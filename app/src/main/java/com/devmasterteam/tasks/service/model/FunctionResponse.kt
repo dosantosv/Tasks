@@ -1,4 +1,4 @@
 package com.devmasterteam.tasks.service.model
 
-class FunctionResponse(val message: String = "", val sucess: Boolean = true) {
+open class FunctionResponse(val message: String = "", val sucess: Boolean = true) {
 }
