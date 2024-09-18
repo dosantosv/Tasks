@@ -30,4 +30,14 @@ class PersonRepository(context: Context): BaseRepository(context) {
         executeCall(listener, call)
     }
 
+    fun create(name: String, email: String, password: String, listener: APIListener<PersonModel>){
+
+        if (!isConnectionAvailable()) {
+            listener.onFailure(context.getString(R.string.ERROR_INTERNET_CONNECTION))
+            return
+        }
+
+        executeCall(listener, remote.create(name, email, password))
+    }
+
 }
